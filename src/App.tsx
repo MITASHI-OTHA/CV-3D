@@ -1,4 +1,4 @@
-import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import { OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
   AvatarCreator,
@@ -8,6 +8,7 @@ import {
 import { useRef, useState } from "react";
 import { Avatar } from "./Avatar";
 import * as THREE from "three"; // Importation de THREE
+import { StarsField } from "./StarFieldShader";
 
 const style = { width: "100%", height: "100vh", border: "none" };
 
@@ -16,6 +17,7 @@ const App = () => {
   return (
     <Canvas style={style}>
       <ambientLight />
+      <Stars count={5000} />
       <ambientLight intensity={0.5} /> {/* Lumière ambiante */}
       <spotLight
         position={[5, 5, 5]}

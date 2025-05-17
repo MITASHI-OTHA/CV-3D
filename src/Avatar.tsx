@@ -2,7 +2,6 @@ import { useGLTF, OrbitControls, useAnimations } from "@react-three/drei";
 import * as THREE from "three"; // Importation de THREE
 import { useFrame, useLoader } from "@react-three/fiber";
 import { RefObject, useEffect, useRef } from "react";
-import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 
 export const Avatar: React.FC<{
   cameraRef: RefObject<THREE.PerspectiveCamera | null>;
@@ -49,6 +48,8 @@ export const Avatar: React.FC<{
   useEffect(() => {
     console.log("animations ", animations);
     console.log("actions ", actions);
+    actions["Scene.001"]?.play();
+    actions["EmptyAction"]?.play();
     // Joue toutes les animations disponibles
     actions["F_Talking_Variations_001.002"]?.play(); // Si tu veux contrôler une animation en particulier
   }, [actions]);
