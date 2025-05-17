@@ -8,7 +8,7 @@ export const Avatar: React.FC<{
   cameraRef: RefObject<THREE.PerspectiveCamera | null>;
 }> = ({ cameraRef }) => {
   const { scene, animations } = useGLTF(
-    "http://localhost/files/blender/60's office stuff exporter4.glb"
+    "http://localhost/cv-3d/files/blender/60's office stuff exporter6.glb"
   );
 
   const { actions } = useAnimations(animations, scene);
@@ -38,11 +38,11 @@ export const Avatar: React.FC<{
     if (controls) {
       // La rotation de la caméra
       const { rotation } = controls.object;
-      console.log("Camera Rotation:", {
+      /*console.log("Camera Rotation:", {
         x: rotation.x, // Inclinaison (pitch)
         y: rotation.y, // Azimut (yaw)
         z: rotation.z, // Roll (rotation autour de l'axe)
-      });
+      });*/
     }
   });
 
@@ -50,7 +50,7 @@ export const Avatar: React.FC<{
     console.log("animations ", animations);
     console.log("actions ", actions);
     // Joue toutes les animations disponibles
-    actions["F_Talking_Variations_001"]?.play(); // Si tu veux contrôler une animation en particulier
+    actions["F_Talking_Variations_001.002"]?.play(); // Si tu veux contrôler une animation en particulier
   }, [actions]);
 
   return (
