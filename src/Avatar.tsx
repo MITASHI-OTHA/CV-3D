@@ -7,7 +7,7 @@ export const Avatar: React.FC<{
   cameraRef: RefObject<THREE.PerspectiveCamera | null>;
 }> = ({ cameraRef }) => {
   const { scene, animations } = useGLTF(
-    "http://localhost/cv-3d/files/blender/60's office stuff exporter6.glb"
+    "http://localhost/cv-3d/files/blender/60's office stuff exporter4.glb"
   );
 
   const { actions } = useAnimations(animations, scene);
@@ -46,6 +46,23 @@ export const Avatar: React.FC<{
   });
 
   useEffect(() => {
+    scene.traverse((child) => {
+      console.log("child.name ", child.name);
+      if (
+        child instanceof THREE.Mesh &&
+        child.material instanceof THREE.Material &&
+        child.isMesh &&
+        child.name === "planete_shell"
+      ) {
+        child.material.transparent = true;
+        child.material.depthWrite = false;
+        child.material.opacity = 0.3;
+        child.material.side = THREE.DoubleSide;
+      }
+    });
+  }, [scene]);
+
+  useEffect(() => {
     console.log("animations ", animations);
     console.log("actions ", actions);
     actions["Scene.001"]?.play();
@@ -56,7 +73,7 @@ export const Avatar: React.FC<{
 
   return (
     <>
-      <primitive object={scene} position={[-10, -10, -3]} scale={[1, 1, 1]} />
+      <primitive object={scene} position={[-17, -12, 2]} scale={[1, 1, 1]} />
       <OrbitControls ref={controlsRef} />
     </>
   );
