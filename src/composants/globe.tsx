@@ -3,20 +3,27 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { BufferAttribute } from "three";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
+import { globeListType } from "../App";
 
-const ReactLogoHtml = () => {
+const ReactLogoHtml: React.FC<{ image: string; width: number }> = ({
+  image,
+  width,
+}) => {
   return (
     <Html center>
-      <img src="/React-icon.png" width={80} alt="React Logo" />
+      <img src={image} width={width} alt="React Logo" />
     </Html>
   );
 };
 
-const CustomGeometryParticles = (props: any) => {
-  const { count, shape, position } = props;
+const CustomGeometryParticles = ({
+  globeItem,
+}: {
+  globeItem: globeListType;
+}) => {
+  const { count, shape, position, color, image, width, scale } = globeItem;
   const points: any = useRef(null);
   const groupRef = useRef<THREE.Group>(null);
-  const positions = new Float32Array(count * 3);
 
   const particlesPosition = useMemo(() => {
     const positions = new Float32Array(count * 3);
@@ -53,7 +60,7 @@ const CustomGeometryParticles = (props: any) => {
   });
 
   return (
-    <group ref={groupRef} position={position}>
+    <group ref={groupRef} position={position} scale={scale}>
       <points>
         <bufferGeometry>
           <bufferAttribute
@@ -61,10 +68,10 @@ const CustomGeometryParticles = (props: any) => {
             args={[particlesPosition, 3]}
           />
         </bufferGeometry>
-        <ReactLogoHtml />
+        <ReactLogoHtml image={image ?? ""} width={width} />
         <pointsMaterial
           size={0.015}
-          color="#5786F5"
+          color={color}
           sizeAttenuation
           depthWrite={false}
         />
@@ -73,19 +80,11 @@ const CustomGeometryParticles = (props: any) => {
   );
 };
 
-interface GlobeProps {
-  position?: [number, number, number];
-}
-
-const Globe = ({ position }: GlobeProps) => {
+const Globe = ({ globeItem }: { globeItem: globeListType }) => {
   return (
     <>
       <ambientLight intensity={0.5} />
-      <CustomGeometryParticles
-        count={2000}
-        shape="sphere"
-        position={position}
-      />
+      <CustomGeometryParticles globeItem={globeItem} />
       <OrbitControls />
     </>
   );

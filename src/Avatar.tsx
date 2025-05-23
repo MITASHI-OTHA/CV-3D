@@ -7,7 +7,7 @@ export const Avatar: React.FC<{
   cameraRef: RefObject<THREE.PerspectiveCamera | null>;
 }> = ({ cameraRef }) => {
   const { scene, animations } = useGLTF(
-    "http://localhost/cv-3d/files/blender/60's office stuff exporter4.glb"
+    "http://localhost/cv-3d/files/blender/anto.glb"
   );
 
   const { actions } = useAnimations(animations, scene);
@@ -64,9 +64,6 @@ export const Avatar: React.FC<{
 
   useEffect(() => {
     console.log("animations ", animations);
-    console.log("actions ", actions);
-    actions["Scene.001"]?.play();
-    actions["EmptyAction"]?.play();
     // Joue toutes les animations disponibles
     actions["F_Talking_Variations_001.002"]?.play(); // Si tu veux contrôler une animation en particulier
   }, [actions]);
