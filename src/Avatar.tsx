@@ -1,18 +1,20 @@
 import { useGLTF, OrbitControls, useAnimations } from "@react-three/drei";
 import * as THREE from "three"; // Importation de THREE
 import { useFrame, useLoader } from "@react-three/fiber";
-import { RefObject, useEffect, useRef } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 
 export const Avatar: React.FC<{
   cameraRef: RefObject<THREE.PerspectiveCamera | null>;
 }> = ({ cameraRef }) => {
   const { scene, animations } = useGLTF(
-    "http://localhost/cv-3d/files/blender/anto.glb"
+    "http://localhost/cv-3d/files/blender/me.glb"
   );
 
   const { actions } = useAnimations(animations, scene);
 
   const controlsRef = useRef(null);
+
+  const ref = useRef<THREE.Object3D>(null);
 
   useEffect(() => {
     if (cameraRef.current) {
@@ -45,9 +47,8 @@ export const Avatar: React.FC<{
     }
   });
 
-  useEffect(() => {
+  /* useEffect(() => {
     scene.traverse((child) => {
-      console.log("child.name ", child.name);
       if (
         child instanceof THREE.Mesh &&
         child.material instanceof THREE.Material &&
@@ -60,17 +61,44 @@ export const Avatar: React.FC<{
         child.material.side = THREE.DoubleSide;
       }
     });
-  }, [scene]);
+  }, [scene]);*/
 
   useEffect(() => {
     console.log("animations ", animations);
     // Joue toutes les animations disponibles
-    actions["F_Talking_Variations_001.002"]?.play(); // Si tu veux contrôler une animation en particulier
+    const action = actions["F_Standing_Idle_001"]; // Si tu veux contrôler une animation en particulier
+    if (action) {
+      action.setLoop(THREE.LoopPingPong, Infinity); // Boucle l'animation indéfiniment
+      action.timeScale = 1; // Vitesse de l'animation
+      action.play(); // Démarre l'animation
+    }
   }, [actions]);
+
+  const [initialY, setInitialY] = useState(0);
+
+  // Enregistre la position de base après le chargement
+  useEffect(() => {
+    if (ref.current) {
+      setInitialY(ref.current.position.y);
+    }
+  }, [ref]);
+
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime();
+    if (ref.current && initialY !== 0) {
+      // Effet de flottaison
+      ref.current.position.y = initialY + Math.sin(t * 2) * 0.2; // 1.5 = hauteur de base, 0.2 = amplitude
+    }
+  });
 
   return (
     <>
-      <primitive object={scene} position={[-17, -12, 2]} scale={[1, 1, 1]} />
+      <primitive
+        ref={ref}
+        object={scene}
+        position={[-17, -12, 2]}
+        scale={[1, 1, 1]}
+      />
       <OrbitControls ref={controlsRef} />
     </>
   );

@@ -23,6 +23,7 @@ export type globeListType = {
   image?: string;
   width: number;
   scale: number;
+  hover?: boolean;
 };
 
 const App = () => {
@@ -79,7 +80,7 @@ const App = () => {
       <PerspectiveCamera
         makeDefault
         position={[99, 99, 1]} // Position initiale de la caméra
-        fov={32}
+        fov={37}
         ref={cameraRef} // Attacher le ref ici
       />
       {globeList.map((globe, index) => (

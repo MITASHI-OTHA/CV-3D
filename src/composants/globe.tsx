@@ -1,7 +1,7 @@
 import { Html, OrbitControls } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, ThreeEvent, useFrame } from "@react-three/fiber";
 import { BufferAttribute } from "three";
-import { useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { globeListType } from "../App";
 
@@ -21,51 +21,87 @@ const CustomGeometryParticles = ({
 }: {
   globeItem: globeListType;
 }) => {
-  const { count, shape, position, color, image, width, scale } = globeItem;
-  const points: any = useRef(null);
+  const { count, shape, position, color, image, width, scale, hover } =
+    globeItem;
+  const points = useRef<THREE.Points>(null);
   const groupRef = useRef<THREE.Group>(null);
-
-  const particlesPosition = useMemo(() => {
-    const positions = new Float32Array(count * 3);
-
-    if (shape === "box") {
-      for (let i = 0; i < count; i++) {
-        let x = (Math.random() - 0.5) * 2;
-        let y = (Math.random() - 0.5) * 2;
-        let z = (Math.random() - 0.5) * 2;
-        positions.set([x, y, z], i * 3);
-      }
-    }
-
+  const [hovered, setHovered] = useState(hover);
+  const restoring = useRef(false);
+  const originalPositions = useRef<Float32Array>(new Float32Array(count * 3));
+  const currentPositions = useRef<Float32Array>(new Float32Array(count * 3));
+  const [scaleGlobe, setScaleGlobe] = useState(scale);
+  // Initialisation des positions
+  useMemo(() => {
     if (shape === "sphere") {
       const distance = 1;
       for (let i = 0; i < count; i++) {
         const theta = THREE.MathUtils.randFloatSpread(360);
         const phi = THREE.MathUtils.randFloatSpread(360);
-        let x = distance * Math.sin(theta) * Math.cos(phi);
-        let y = distance * Math.sin(theta) * Math.sin(phi);
-        let z = distance * Math.cos(theta);
-        positions.set([x, y, z], i * 3);
+        const x = distance * Math.sin(theta) * Math.cos(phi);
+        const y = distance * Math.sin(theta) * Math.sin(phi);
+        const z = distance * Math.cos(theta);
+
+        originalPositions.current.set([x, y, z], i * 3);
+        currentPositions.current.set([x, y, z], i * 3);
       }
     }
-
-    return positions;
   }, [count, shape]);
 
-  // ✅ Ajoute la rotation ici
-  useFrame(() => {
-    if (groupRef.current && groupRef.current.rotation) {
+  // Crée un tableau "fixe" au démarrage
+  const positionsArray = useMemo(() => new Float32Array(count * 3), [count]);
+
+  // Animation frame
+  useFrame((state) => {
+    // Rotation du groupe
+    if (groupRef.current) {
       groupRef.current.rotation.y += 0.002;
     }
+
+    if (!points.current?.geometry || !groupRef.current) return;
+
+    const positions = points.current.geometry.attributes.position;
+    const delta = state.clock.getDelta();
+
+    if (hovered && groupRef.current) {
+      setScaleGlobe(scale * 1.2);
+      groupRef.current.rotation.y += 0.01;
+    } else {
+      setScaleGlobe(scale);
+      groupRef.current.rotation.y += 0.002;
+    }
+    positionsArray.set(currentPositions.current);
+    positions.array.set(positionsArray);
+    positions.needsUpdate = true;
+    points.current.geometry.attributes.position.needsUpdate = true;
   });
 
+  // Gestion des événements
+  interface PointerOverEvent extends ThreeEvent<PointerEvent> {}
+
+  const handlePointerOver = useCallback((e: PointerOverEvent) => {
+    e.stopPropagation();
+    setHovered(true);
+  }, []);
+
+  const handlePointerOut = useCallback((e: PointerOverEvent) => {
+    e.stopPropagation();
+    setHovered(false);
+  }, []);
+
   return (
-    <group ref={groupRef} position={position} scale={scale}>
-      <points>
-        <bufferGeometry>
+    <group
+      ref={groupRef}
+      position={position}
+      scale={scaleGlobe}
+      onPointerOver={handlePointerOver}
+      onPointerOut={handlePointerOut}
+    >
+      <points ref={points}>
+        <bufferGeometry attach="geometry">
           <bufferAttribute
             attach="attributes-position"
-            args={[particlesPosition, 3]}
+            array={positionsArray}
+            args={[positionsArray, 3]}
           />
         </bufferGeometry>
         <ReactLogoHtml image={image ?? ""} width={width} />
