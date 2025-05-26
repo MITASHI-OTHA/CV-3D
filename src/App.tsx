@@ -69,7 +69,7 @@ const App = () => {
   return (
     <Canvas style={style}>
       <ambientLight />
-      <Stars count={5000} />
+      <Stars count={3000} />
       <ambientLight intensity={0.5} /> {/* Lumière ambiante */}
       <spotLight
         position={[5, 5, 5]}

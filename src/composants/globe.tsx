@@ -64,7 +64,7 @@ const CustomGeometryParticles = ({
 
     if (hovered && groupRef.current) {
       setScaleGlobe(scale * 1.2);
-      groupRef.current.rotation.y += 0.01;
+      groupRef.current.rotation.y += 0.1;
     } else {
       setScaleGlobe(scale);
       groupRef.current.rotation.y += 0.002;

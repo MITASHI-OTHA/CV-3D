@@ -2,6 +2,8 @@ import { useGLTF, OrbitControls, useAnimations } from "@react-three/drei";
 import * as THREE from "three"; // Importation de THREE
 import { useFrame, useLoader } from "@react-three/fiber";
 import { RefObject, useEffect, useRef, useState } from "react";
+import Soleil from "./composants/Soleil";
+import { EffectComposer, Bloom } from "@react-three/postprocessing";
 
 export const Avatar: React.FC<{
   cameraRef: RefObject<THREE.PerspectiveCamera | null>;
@@ -91,6 +93,16 @@ export const Avatar: React.FC<{
     }
   });
 
+  /*   useEffect(() => {
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh && child.name.includes("Soleil")) {
+        console.log("OKKK", child.name);
+        // child.material.emissive = new THREE.Color(0xffff00);
+        // child.material.emissiveIntensity = 1;
+      }
+    });
+  }, [scene]); */
+
   return (
     <>
       <primitive
@@ -99,7 +111,14 @@ export const Avatar: React.FC<{
         position={[-17, -12, 2]}
         scale={[1, 1, 1]}
       />
-      <OrbitControls ref={controlsRef} />
+      <EffectComposer>
+        <Bloom
+          luminanceThreshold={1}
+          luminanceSmoothing={0.7}
+          height={300}
+          intensity={0.2}
+        />
+      </EffectComposer>
     </>
   );
 };

@@ -7,6 +7,7 @@
     "@mediapipe/tasks-vision": "^0.10.22-rc.20250304",
     "@react-three/drei": "^10.0.7",
     "@react-three/fiber": "^9.1.2",
+    "@react-three/postprocessing": "^3.0.4",
     "@readyplayerme/react-avatar-creator": "^0.5.0",
     "@readyplayerme/visage": "^6.10.0",
     "@testing-library/dom": "^10.4.0",
