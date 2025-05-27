@@ -93,15 +93,15 @@ export const Avatar: React.FC<{
     }
   });
 
-  /*   useEffect(() => {
+  useEffect(() => {
     scene.traverse((child) => {
-      if (child instanceof THREE.Mesh && child.name.includes("Soleil")) {
-        console.log("OKKK", child.name);
-        // child.material.emissive = new THREE.Color(0xffff00);
-        // child.material.emissiveIntensity = 1;
+      console.log("name ", child.name);
+      if (child instanceof THREE.Mesh && child.name.includes("Base")) {
+        child.material.emissive = new THREE.Color(0xffff00);
+        child.material.emissiveIntensity = 150;
       }
     });
-  }, [scene]); */
+  }, [scene]);
 
   return (
     <>
