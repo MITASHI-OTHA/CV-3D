@@ -12,6 +12,10 @@ import { StarsField } from "./StarFieldShader";
 import AngularScene from "./AngularSphere";
 import AngularSphereScene from "./AngularSphere";
 import Globe from "./composants/globe";
+import GalaxyCloud from "./galaxyCloudShader";
+import Smoke from "./composants/Smoke";
+import Planets from "./composants/Planets";
+import NuageGalactique from "./composants/nuageGalactic";
 
 const style = { width: "100%", height: "100vh", border: "none" };
 
@@ -67,9 +71,18 @@ const App = () => {
   ];
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   return (
-    <Canvas style={style}>
+    <Canvas style={style} className="bg-[#0a192f]">
       <ambientLight />
-      <Stars count={3000} />
+      <Stars
+        radius={300}
+        depth={50}
+        count={8000}
+        factor={6}
+        saturation={0.6}
+        fade
+        speed={1}
+      />
+      <NuageGalactique />
       <ambientLight intensity={0.5} /> {/* Lumière ambiante */}
       <spotLight
         position={[5, 5, 5]}
@@ -80,7 +93,7 @@ const App = () => {
       <PerspectiveCamera
         makeDefault
         position={[99, 99, 1]} // Position initiale de la caméra
-        fov={37}
+        fov={39}
         ref={cameraRef} // Attacher le ref ici
       />
       {globeList.map((globe, index) => (

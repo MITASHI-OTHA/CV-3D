@@ -9,7 +9,7 @@ export const Avatar: React.FC<{
   cameraRef: RefObject<THREE.PerspectiveCamera | null>;
 }> = ({ cameraRef }) => {
   const { scene, animations } = useGLTF(
-    "http://localhost/cv-3d/files/blender/me.glb"
+    "http://localhost/cv-3d/files/blender/me2.glb"
   );
 
   const { actions } = useAnimations(animations, scene);
