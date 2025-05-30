@@ -96,7 +96,6 @@ export default function NuageGalactique() {
     <>
       <ambientLight intensity={0.1} />
       <GalacticClouds count={1000} radius={7} />
-      <OrbitControls />
     </>
   );
 }

@@ -2,7 +2,6 @@ import { useGLTF, OrbitControls, useAnimations } from "@react-three/drei";
 import * as THREE from "three"; // Importation de THREE
 import { useFrame, useLoader } from "@react-three/fiber";
 import { RefObject, useEffect, useRef, useState } from "react";
-import Soleil from "./composants/Soleil";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 
 export const Avatar: React.FC<{
@@ -68,12 +67,13 @@ export const Avatar: React.FC<{
   useEffect(() => {
     console.log("animations ", animations);
     // Joue toutes les animations disponibles
-    const action = actions["F_Standing_Idle_001"]; // Si tu veux contrôler une animation en particulier
+    const action = actions["F_Standing_Idle_001.001"]; // Si tu veux contrôler une animation en particulier
     if (action) {
       action.setLoop(THREE.LoopPingPong, Infinity); // Boucle l'animation indéfiniment
       action.timeScale = 1; // Vitesse de l'animation
       action.play(); // Démarre l'animation
     }
+    //actions["F_Standing_Idle_Variations_008.001"]?.play();
   }, [actions]);
 
   const [initialY, setInitialY] = useState(0);
@@ -81,6 +81,7 @@ export const Avatar: React.FC<{
   // Enregistre la position de base après le chargement
   useEffect(() => {
     if (ref.current) {
+      ref.current.renderOrder = 1;
       setInitialY(ref.current.position.y);
     }
   }, [ref]);
@@ -95,7 +96,7 @@ export const Avatar: React.FC<{
 
   useEffect(() => {
     scene.traverse((child) => {
-      console.log("name ", child.name);
+      //  console.log("name ", child.name);
       if (child instanceof THREE.Mesh && child.name.includes("Base")) {
         child.material.emissive = new THREE.Color(0xffff00);
         child.material.emissiveIntensity = 150;

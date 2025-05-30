@@ -121,7 +121,6 @@ const Globe = ({ globeItem }: { globeItem: globeListType }) => {
     <>
       <ambientLight intensity={0.5} />
       <CustomGeometryParticles globeItem={globeItem} />
-      <OrbitControls />
     </>
   );
 };

@@ -1,5 +1,5 @@
 import { OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   AvatarCreator,
   AvatarCreatorConfig,
@@ -16,6 +16,15 @@ import GalaxyCloud from "./galaxyCloudShader";
 import Smoke from "./composants/Smoke";
 import Planets from "./composants/Planets";
 import NuageGalactique from "./composants/nuageGalactic";
+import Galaxys from "./composants/Galaxy";
+import { Leva } from "leva";
+import Sun from "./composants/sun";
+import { ShootingStar } from "./composants/EtoileFilante";
+// import { EffectComposer } from "postprocessing";
+import { EffectComposer, Bloom } from "@react-three/postprocessing";
+import { useThree as useThreeFiber } from "@react-three/fiber";
+import { FloatingCamera } from "./composants/FloatingCamera";
+import Galaxy from "./composants/Galaxy";
 
 const style = { width: "100%", height: "100vh", border: "none" };
 
@@ -28,6 +37,19 @@ export type globeListType = {
   width: number;
   scale: number;
   hover?: boolean;
+};
+
+const Controls = () => {
+  const { camera, gl } = useThree();
+  return (
+    <OrbitControls
+      camera={camera}
+      domElement={gl.domElement}
+      enableRotate={false}
+      enableZoom={false}
+      enablePan={false}
+    />
+  );
 };
 
 const App = () => {
@@ -75,10 +97,10 @@ const App = () => {
       <ambientLight />
       <Stars
         radius={300}
-        depth={50}
+        depth={150}
         count={8000}
-        factor={6}
-        saturation={0.6}
+        factor={8}
+        saturation={3}
         fade
         speed={1}
       />
@@ -90,16 +112,28 @@ const App = () => {
         penumbra={1}
         intensity={1}
       />
+      {/*       <group position={[0, 0, 10]}>
+        <Galaxy />
+      </group>
+      <Leva hidden /> */}
       <PerspectiveCamera
         makeDefault
         position={[99, 99, 1]} // Position initiale de la caméra
         fov={39}
         ref={cameraRef} // Attacher le ref ici
       />
+      <directionalLight intensity={0.5} position={[5, 5, 5]} />
       {globeList.map((globe, index) => (
         <Globe key={index} globeItem={globe} />
       ))}
       <Avatar cameraRef={cameraRef} />
+      <ambientLight intensity={1} />
+      <ShootingStar />
+      <EffectComposer>
+        <Bloom mipmapBlur luminanceThreshold={2} />
+      </EffectComposer>
+      <FloatingCamera amplitude={0.7} speed={0.5} />
+      <Controls />
     </Canvas>
   );
 };
