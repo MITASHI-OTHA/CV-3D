@@ -25,6 +25,7 @@ import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { useThree as useThreeFiber } from "@react-three/fiber";
 import { FloatingCamera } from "./composants/FloatingCamera";
 import Galaxy from "./composants/Galaxy";
+import BackgroundMusic from "./composants/BackGroundMusic";
 
 const style = { width: "100%", height: "100vh", border: "none" };
 
@@ -93,8 +94,7 @@ const App = () => {
   ];
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   return (
-    <Canvas style={style} className="bg-[#0a192f]">
-      <ambientLight />
+    <Canvas style={style}>
       <Stars
         radius={300}
         depth={150}
@@ -105,14 +105,7 @@ const App = () => {
         speed={1}
       />
       <NuageGalactique />
-      <ambientLight intensity={0.5} /> {/* Lumière ambiante */}
-      <spotLight
-        position={[5, 5, 5]}
-        angle={Math.PI / 4}
-        penumbra={1}
-        intensity={1}
-      />
-      {/*       <group position={[0, 0, 10]}>
+      {/*       <group position={[0, 0, -6]} scale={0.2}>
         <Galaxy />
       </group>
       <Leva hidden /> */}
@@ -126,14 +119,20 @@ const App = () => {
       {globeList.map((globe, index) => (
         <Globe key={index} globeItem={globe} />
       ))}
+      <ambientLight intensity={5} /> {/* Lumière ambiante */}
       <Avatar cameraRef={cameraRef} />
-      <ambientLight intensity={1} />
       <ShootingStar />
       <EffectComposer>
         <Bloom mipmapBlur luminanceThreshold={2} />
       </EffectComposer>
       <FloatingCamera amplitude={0.7} speed={0.5} />
       <Controls />
+      <BackgroundMusic
+        musicUrl="son.mp3"
+        volume={0.5}
+        loop={true}
+        playOnMount={false}
+      />
     </Canvas>
   );
 };

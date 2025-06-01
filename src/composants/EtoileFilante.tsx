@@ -50,7 +50,7 @@ export function ShootingStar() {
     if (!active || !ref.current) return;
     ref.current.renderOrder = 0;
     const elapsed = clock.getElapsedTime() - startTime;
-    if (elapsed > 5) {
+    if (elapsed > 10) {
       setActive(false);
       return;
     }
