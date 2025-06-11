@@ -1,13 +1,4 @@
-import { OrbitControls, PerspectiveCamera, Stars } from "@react-three/drei";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import {
-  AvatarCreator,
-  AvatarCreatorConfig,
-  AvatarExportedEvent,
-} from "@readyplayerme/react-avatar-creator";
-import { useRef, useState } from "react";
 import { Avatar } from "./Avatar";
-import * as THREE from "three"; // Importation de THREE
 import { StarsField } from "./StarFieldShader";
 import AngularScene from "./AngularSphere";
 import AngularSphereScene from "./AngularSphere";
@@ -17,15 +8,22 @@ import Smoke from "./composants/Smoke";
 import Planets from "./composants/Planets";
 import NuageGalactique from "./composants/nuageGalactic";
 import Galaxys from "./composants/Galaxy";
-import { Leva } from "leva";
 import Sun from "./composants/sun";
 import { ShootingStar } from "./composants/EtoileFilante";
 // import { EffectComposer } from "postprocessing";
-import { EffectComposer, Bloom } from "@react-three/postprocessing";
-import { useThree as useThreeFiber } from "@react-three/fiber";
 import { FloatingCamera } from "./composants/FloatingCamera";
 import Galaxy from "./composants/Galaxy";
 import BackgroundMusic from "./composants/BackGroundMusic";
+import { useRef } from "react";
+import * as THREE from "three";
+import { Canvas, useThree } from "@react-three/fiber";
+import {
+  OrbitControls,
+  PerspectiveCamera,
+  SpotLight,
+  Stars,
+} from "@react-three/drei";
+import { Bloom, EffectComposer } from "@react-three/postprocessing";
 
 const style = { width: "100%", height: "100vh", border: "none" };
 
@@ -93,8 +91,9 @@ const App = () => {
     },
   ];
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+
   return (
-    <Canvas style={style}>
+    <Canvas style={style} shadows>
       <Stars
         radius={300}
         depth={150}
@@ -106,9 +105,9 @@ const App = () => {
       />
       <NuageGalactique />
       {/*       <group position={[0, 0, -6]} scale={0.2}>
-        <Galaxy />
-      </group>
-      <Leva hidden /> */}
+          <Galaxy />
+        </group>
+        <Leva hidden /> */}
       <PerspectiveCamera
         makeDefault
         position={[99, 99, 1]} // Position initiale de la caméra
@@ -119,20 +118,24 @@ const App = () => {
       {globeList.map((globe, index) => (
         <Globe key={index} globeItem={globe} />
       ))}
-      <ambientLight intensity={5} /> {/* Lumière ambiante */}
+      <primitive
+        object={new THREE.PointLight(0xffffff, 7000, 100, 2)}
+        position={[10, 10, 10]}
+      />
       <Avatar cameraRef={cameraRef} />
       <ShootingStar />
       <EffectComposer>
         <Bloom mipmapBlur luminanceThreshold={2} />
       </EffectComposer>
-      <FloatingCamera amplitude={0.7} speed={0.5} />
-      <Controls />
+      {/* <FloatingCamera amplitude={0.7} speed={0.5} /> */}
+      {/*  <Controls /> */}
       <BackgroundMusic
         musicUrl="son.mp3"
         volume={0.5}
         loop={true}
         playOnMount={false}
       />
+      <OrbitControls enableZoom enableRotate enablePan />
     </Canvas>
   );
 };

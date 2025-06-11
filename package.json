@@ -21,7 +21,7 @@
     "react-dom": "^19.1.0",
     "react-scripts": "5.0.1",
     "simplex-noise": "^4.0.3",
-    "three": "^0.166.1",
+    "three": "^0.177.0",
     "three-fbx-loader": "^1.0.3",
     "typescript": "^5.8.3",
     "util": "^0.12.5",

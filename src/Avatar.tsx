@@ -1,7 +1,7 @@
 import { useGLTF, OrbitControls, useAnimations } from "@react-three/drei";
 import * as THREE from "three"; // Importation de THREE
 import { useFrame, useLoader } from "@react-three/fiber";
-import { RefObject, useEffect, useRef, useState } from "react";
+import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { Model } from "./models/Scenes";
 
@@ -9,7 +9,7 @@ export const Avatar: React.FC<{
   cameraRef: RefObject<THREE.PerspectiveCamera | null>;
 }> = ({ cameraRef }) => {
   const { scene, animations, nodes, materials } = useGLTF(
-    "http://localhost/cv-3d/files/blender/me5.glb"
+    "http://localhost/cv-3d/files/blender/me5.1.glb"
   );
 
   const { actions } = useAnimations(animations, scene);
@@ -50,37 +50,29 @@ export const Avatar: React.FC<{
       });*/
     }
   });
-  const setColor = (color: string, child: THREE.Object3D) => {
+  const setColor = (
+    color: string,
+    child: THREE.Object3D,
+    intensity: number
+  ) => {
+    // Suppose que `child` est un mesh
     if (
       child instanceof THREE.Mesh &&
       child.material instanceof THREE.MeshStandardMaterial
     ) {
-      child.material = child.material.clone(); // Évitez de modifier un matériau partagé
-      child.material.color.set(color);
+      // Clone le matériau si besoin
+      child.material = child.material.clone();
+      child.material.color = new THREE.Color(color);
+
+      // Ajoute une lumière ponctuelle (PointLight) au-dessus du child
+      const pointLight = new THREE.PointLight(color, 10000, 10);
+      pointLight.position.copy(child.getWorldPosition(new THREE.Vector3()));
+      child.add(pointLight);
     }
   };
 
   useEffect(() => {
-    scene.traverse((child) => {
-      console.log("Child name: ", child.name);
-      if (
-        child instanceof THREE.Mesh &&
-        child.material instanceof THREE.Material &&
-        child.isMesh
-      ) {
-        // Appliquer une couleur spécifique à l'InnerRing
-        if (child.name === "Icosphere020_Sand002_0") {
-          setColor("#03A9F4", child);
-          /*  light.position.copy(childCopy.getWorldPosition(new THREE.Vector3())); */
-        } else if (child.name === "Renderer_Hair002") {
-          setColor("#3b3838", child);
-        }
-      }
-    });
-  }, [scene]);
-
-  useEffect(() => {
-    console.log("animations ", animations);
+    //console.log("animations ", animations);
     const animationsShouldPlay = [
       "F_Standing_Idle_001.001",
       "F_Standing_Idle_Variations_001.001",
@@ -105,7 +97,7 @@ export const Avatar: React.FC<{
           animationsShouldPlay[
             Math.floor(Math.random() * animationsShouldPlay.length)
           ];
-        console.log("nextAnimation ", nextAnimation);
+        //console.log("nextAnimation ", nextAnimation);
         currentAction = actions[nextAnimation];
         currentAction?.reset().play();
         currentAction?.setLoop(THREE.LoopOnce, 0);
@@ -151,39 +143,57 @@ export const Avatar: React.FC<{
     }
   });
 
-  useEffect(() => {
-    scene.traverse((child) => {
-      //  console.log("name ", child.name);
-      if (child instanceof THREE.Mesh && child.name.includes("Base")) {
-        child.material.emissive = new THREE.Color(0xffff00);
-        child.material.emissiveIntensity = 150;
+  const handleHover = (e: any) => {
+    console.log("Survol de l'avatar !", e.object.name);
+    const child = e.object;
+    if (child instanceof THREE.Mesh) {
+      const pos = new THREE.Vector3();
+      child.getWorldPosition(pos);
+      console.log("Position globale :", pos);
+      // Vérifie si le child a un matériau
+      if (child.material instanceof THREE.MeshStandardMaterial) {
+        // Change la couleur du matériau au survol
+        if (
+          child.name === "Icosphere020_Sand002_0" ||
+          child.name === "P1_Water003_Ground003_0"
+        ) {
+          console.log("Icosphere020_Sand002_0 trouvé ");
+          setColor("#45ff61", child, 3);
+        } else if (
+          child.name === "P1_Water003_Lava001_0" ||
+          child.name === "P1_Water003_Lava_0"
+        ) {
+          setColor("#31f6e2", child, 3);
+        } else if (child.name === "P1_Water003_Rocks003_0") {
+          setColor("#6de93d", child, 3);
+        } else if (child.name === "P1_Water001_Clouds001_0001") {
+          setColor("#31f6e2", child, 3);
+        } else if (child.name === "Icosphere021_Treewood002_0") {
+          setColor("#31f6e2", child, 3);
+        }
       }
-    });
-  }, [scene]);
-
-  const MyPolygone = () => {
-    console.log("materialsXXX ", materials);
-    return (
-      <mesh
-        geometry={(nodes.Icosphere002 as THREE.Mesh).geometry}
-        scale={[1, 1, 1]}
-      >
-        <meshStandardMaterial
-          {...materials["Material.007"]}
-          flatShading // Force un rendu non lissé
-        />
-      </mesh>
-    );
+    }
   };
 
+  const pointLight = useMemo(() => {
+    return new THREE.PointLight(0xffffff, 500, 100, 1);
+  }, []);
+  //-37, -131, 92
+  const blenderPosition = new THREE.Vector3(-50, -60, 190);
+  const groupOffset = new THREE.Vector3(-17, -12, 2);
+  const correctedLightPosition = blenderPosition.clone().sub(groupOffset);
+
+  useEffect(() => {
+    const helper = new THREE.PointLightHelper(pointLight, 5);
+    scene.add(helper);
+  }, []);
+
   return (
-    <>
-      <primitive
-        ref={ref}
-        object={scene}
-        position={[-17, -12, 2]}
-        scale={[1, 1, 1]}
-      />
-    </>
+    <group position={[-17, -12, 2]}>
+      <primitive ref={ref} object={scene} />
+
+      {/* Lumière */}
+      <primitive object={pointLight} position={blenderPosition} />
+    </group>
   );
 };
