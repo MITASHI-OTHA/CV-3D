@@ -1,4 +1,4 @@
-import { Html, OrbitControls } from "@react-three/drei";
+import { Html, OrbitControls, Trail } from "@react-three/drei";
 import { Canvas, ThreeEvent, useFrame } from "@react-three/fiber";
 import { BufferAttribute } from "three";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -30,6 +30,12 @@ const CustomGeometryParticles = ({
   const originalPositions = useRef<Float32Array>(new Float32Array(count * 3));
   const currentPositions = useRef<Float32Array>(new Float32Array(count * 3));
   const [scaleGlobe, setScaleGlobe] = useState(scale);
+  const ref = useRef<THREE.Mesh>(null);
+  const ref2 = useRef<THREE.Mesh>(null);
+  const trailPosition = useRef(new THREE.Vector3());
+  const trailRadius = useRef(0.6); // Paramétrable pour ajuster l'espace
+  const trailSpeed = 1; // Define trail speed with an appropriate value
+
   // Initialisation des positions
   useMemo(() => {
     if (shape === "sphere") {
@@ -73,6 +79,28 @@ const CustomGeometryParticles = ({
     positions.array.set(positionsArray);
     positions.needsUpdate = true;
     points.current.geometry.attributes.position.needsUpdate = true;
+
+    // Update trail position to stay closer to the perimeter of points
+    if (ref.current && ref2.current) {
+      const t = state.clock.getElapsedTime() * trailSpeed; // Use the adjustable trail speed
+      const radius = trailRadius.current; // Use the adjustable trail radius
+
+      // Trail ref movement
+      trailPosition.current.set(
+        Math.sin(t) * radius,
+        Math.atan(t) * Math.cos(t / 2) * radius,
+        Math.cos(t) * radius
+      );
+      ref.current.position.copy(trailPosition.current);
+
+      // Trail ref2 movement (symmetrical)
+      const symmetricalTrailPosition = new THREE.Vector3(
+        -trailPosition.current.x,
+        -trailPosition.current.y,
+        -trailPosition.current.z
+      );
+      ref2.current.position.copy(symmetricalTrailPosition);
+    }
   });
 
   // Gestion des événements
@@ -97,6 +125,28 @@ const CustomGeometryParticles = ({
       onPointerOut={handlePointerOut}
     >
       <points ref={points}>
+        <Trail
+          width={2}
+          length={1}
+          color={new THREE.Color(7, 3, 5)}
+          attenuation={(t) => t * 1}
+        >
+          <mesh ref={ref}>
+            <sphereGeometry args={[0.07]} />
+            <meshBasicMaterial color={[7, 3, 5]} toneMapped={false} />
+          </mesh>
+        </Trail>
+        <Trail
+          width={2}
+          length={1}
+          color={new THREE.Color(7, 3, 5)}
+          attenuation={(t) => t * 1}
+        >
+          <mesh ref={ref2}>
+            <sphereGeometry args={[0.07]} />
+            <meshBasicMaterial color={[7, 3, 5]} toneMapped={false} />
+          </mesh>
+        </Trail>
         <bufferGeometry attach="geometry">
           <bufferAttribute
             attach="attributes-position"
@@ -119,7 +169,7 @@ const CustomGeometryParticles = ({
 const Globe = ({ globeItem }: { globeItem: globeListType }) => {
   return (
     <>
-      <ambientLight intensity={0.5} />
+      {/* <ambientLight intensity={0.5} /> */}
       <CustomGeometryParticles globeItem={globeItem} />
     </>
   );

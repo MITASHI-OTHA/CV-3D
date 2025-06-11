@@ -123,19 +123,18 @@ const App = () => {
         position={[10, 10, 10]}
       />
       <Avatar cameraRef={cameraRef} />
-      <ShootingStar />
+      {/* <ShootingStar /> */}
       <EffectComposer>
         <Bloom mipmapBlur luminanceThreshold={2} />
       </EffectComposer>
-      {/* <FloatingCamera amplitude={0.7} speed={0.5} /> */}
-      {/*  <Controls /> */}
+      <FloatingCamera amplitude={0.7} speed={0.5} />
+      <Controls />
       <BackgroundMusic
         musicUrl="son.mp3"
         volume={0.5}
         loop={true}
         playOnMount={false}
       />
-      <OrbitControls enableZoom enableRotate enablePan />
     </Canvas>
   );
 };

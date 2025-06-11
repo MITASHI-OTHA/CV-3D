@@ -53,7 +53,7 @@ export const Avatar: React.FC<{
   const setColor = (
     color: string,
     child: THREE.Object3D,
-    intensity: number
+    positions: { x: number; y: number; z: number }
   ) => {
     // Suppose que `child` est un mesh
     if (
@@ -61,13 +61,9 @@ export const Avatar: React.FC<{
       child.material instanceof THREE.MeshStandardMaterial
     ) {
       // Clone le matériau si besoin
-      child.material = child.material.clone();
-      child.material.color = new THREE.Color(color);
-
-      // Ajoute une lumière ponctuelle (PointLight) au-dessus du child
-      const pointLight = new THREE.PointLight(color, 10000, 10);
-      pointLight.position.copy(child.getWorldPosition(new THREE.Vector3()));
-      child.add(pointLight);
+      setBlenderPosition(
+        new THREE.Vector3(positions.x, positions.y, positions.z)
+      );
     }
   };
 
@@ -150,47 +146,73 @@ export const Avatar: React.FC<{
       const pos = new THREE.Vector3();
       child.getWorldPosition(pos);
       console.log("Position globale :", pos);
+      // Change le curseur en pointer
+      document.body.style.cursor = "pointer";
       // Vérifie si le child a un matériau
       if (child.material instanceof THREE.MeshStandardMaterial) {
         // Change la couleur du matériau au survol
-        if (
-          child.name === "Icosphere020_Sand002_0" ||
-          child.name === "P1_Water003_Ground003_0"
-        ) {
+        if (child.name === "Icosphere020_Sand002_0") {
           console.log("Icosphere020_Sand002_0 trouvé ");
-          setColor("#45ff61", child, 3);
+          setColor("#45ff61", child, { x: -50, y: -60, z: 190 });
         } else if (
           child.name === "P1_Water003_Lava001_0" ||
-          child.name === "P1_Water003_Lava_0"
+          child.name === "P1_Water003_Lava_0" ||
+          child.name === "P1_Water003_Ground003_0"
         ) {
-          setColor("#31f6e2", child, 3);
+          setColor("#31f6e2", child, { x: -40, y: 10, z: 80 });
         } else if (child.name === "P1_Water003_Rocks003_0") {
-          setColor("#6de93d", child, 3);
+          setColor("#6de93d", child, { x: -40, y: 10, z: 80 });
         } else if (child.name === "P1_Water001_Clouds001_0001") {
-          setColor("#31f6e2", child, 3);
+          setColor("#31f6e2", child, { x: -10, y: -100, z: 92 });
         } else if (child.name === "Icosphere021_Treewood002_0") {
-          setColor("#31f6e2", child, 3);
+          setColor("#31f6e2", child, { x: -40, y: 10, z: 80 });
+        } else if (
+          child.name === "Planet02_Snow002_0" ||
+          child.name === "Planet02_Ice_0"
+        ) {
+          setColor("#31f6e2", child, { x: -80, y: -10, z: 220 });
         }
       }
     }
   };
 
+  const handlePointerLeave = (e: any) => {
+    console.log("Sortie de l'avatar !", e.object.name);
+    // setBlenderPosition(new THREE.Vector3(-1000, -1000, 920));
+    document.body.style.cursor = "auto";
+  };
+
   const pointLight = useMemo(() => {
     return new THREE.PointLight(0xffffff, 500, 100, 1);
   }, []);
-  //-37, -131, 92
-  const blenderPosition = new THREE.Vector3(-50, -60, 190);
-  const groupOffset = new THREE.Vector3(-17, -12, 2);
-  const correctedLightPosition = blenderPosition.clone().sub(groupOffset);
+  const [blenderPosition, setBlenderPosition] = useState<THREE.Vector3>(
+    new THREE.Vector3(-50, -60, 190)
+  );
 
   useEffect(() => {
     const helper = new THREE.PointLightHelper(pointLight, 5);
-    scene.add(helper);
+    //scene.add(helper);
   }, []);
 
+  useEffect(() => {
+    scene.traverse((child) => {
+      //  console.log("name ", child.name);
+      if (child instanceof THREE.Mesh && child.name.includes("Base")) {
+        child.material.emissive = new THREE.Color(0xffff00);
+        child.material.emissiveIntensity = 150;
+      }
+    });
+  }, [scene]);
+
   return (
-    <group position={[-17, -12, 2]}>
-      <primitive ref={ref} object={scene} />
+    <group>
+      <primitive
+        ref={ref}
+        object={scene}
+        onPointerEnter={handleHover}
+        onPointerLeave={handlePointerLeave}
+        position={[-17, -12, 2]}
+      />
 
       {/* Lumière */}
       <primitive object={pointLight} position={blenderPosition} />
