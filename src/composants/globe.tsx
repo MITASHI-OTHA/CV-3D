@@ -21,8 +21,17 @@ const CustomGeometryParticles = ({
 }: {
   globeItem: globeListType;
 }) => {
-  const { count, shape, position, color, image, width, scale, hover } =
-    globeItem;
+  const {
+    count,
+    shape,
+    position,
+    color,
+    image,
+    width,
+    scale,
+    hover,
+    colorsTrails,
+  } = globeItem;
   const points = useRef<THREE.Points>(null);
   const groupRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(hover);
@@ -133,7 +142,7 @@ const CustomGeometryParticles = ({
         >
           <mesh ref={ref}>
             <sphereGeometry args={[0.07]} />
-            <meshBasicMaterial color={[7, 3, 5]} toneMapped={false} />
+            <meshBasicMaterial color={colorsTrails} toneMapped={false} />
           </mesh>
         </Trail>
         <Trail
@@ -144,7 +153,7 @@ const CustomGeometryParticles = ({
         >
           <mesh ref={ref2}>
             <sphereGeometry args={[0.07]} />
-            <meshBasicMaterial color={[7, 3, 5]} toneMapped={false} />
+            <meshBasicMaterial color={colorsTrails} toneMapped={false} />
           </mesh>
         </Trail>
         <bufferGeometry attach="geometry">

@@ -1,4 +1,9 @@
-import { useGLTF, OrbitControls, useAnimations } from "@react-three/drei";
+import {
+  useGLTF,
+  OrbitControls,
+  useAnimations,
+  Trail,
+} from "@react-three/drei";
 import * as THREE from "three"; // Importation de THREE
 import { useFrame, useLoader } from "@react-three/fiber";
 import { RefObject, useEffect, useMemo, useRef, useState } from "react";
@@ -19,6 +24,8 @@ export const Avatar: React.FC<{
   const ref = useRef<THREE.Object3D>(null);
 
   const avatarRef = useRef<THREE.Object3D | null>(null);
+
+  const ref2 = useRef<THREE.Mesh>(null);
 
   useEffect(() => {
     if (cameraRef.current) {
@@ -213,9 +220,52 @@ export const Avatar: React.FC<{
         onPointerLeave={handlePointerLeave}
         position={[-17, -12, 2]}
       />
-
       {/* Lumière */}
       <primitive object={pointLight} position={blenderPosition} />
+      <group position={[-3, -7, 2]}>
+        <Trail
+          width={2}
+          length={1}
+          color={"hotpink"} // Color of the line
+          attenuation={(t) => t}
+          decay={100}
+          stride={100}
+        >
+          <mesh ref={ref2}>
+            {/*             <tubeGeometry
+              args={[
+                new THREE.CatmullRomCurve3(
+                  Array.from(
+                    { length: 20 },
+                    (_, i) =>
+                      new THREE.Vector3(
+                        Math.sin(i * 0.5) * 0.5,
+                        i * 0.2,
+                        Math.cos(i * 0.5) * 0.5
+                      )
+                  )
+                ),
+                30, // tubular segments
+                0.07, // radius
+                18, // radial segments
+                false, // closed
+              ]}
+            /> */}
+            <meshStandardMaterial
+              args={[
+                {
+                  color: new THREE.Color(0.5, 0.8, 1),
+                  emissive: new THREE.Color(0.2, 0.5, 1),
+                  emissiveIntensity: 1.5,
+                  toneMapped: false,
+                  transparent: true,
+                  opacity: 0.8,
+                },
+              ]}
+            />
+          </mesh>
+        </Trail>
+      </group>
     </group>
   );
 };

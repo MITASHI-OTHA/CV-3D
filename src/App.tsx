@@ -16,12 +16,13 @@ import Galaxy from "./composants/Galaxy";
 import BackgroundMusic from "./composants/BackGroundMusic";
 import { useRef } from "react";
 import * as THREE from "three";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, Color, useThree } from "@react-three/fiber";
 import {
   OrbitControls,
   PerspectiveCamera,
   SpotLight,
   Stars,
+  Trail,
 } from "@react-three/drei";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
 
@@ -36,6 +37,7 @@ export type globeListType = {
   width: number;
   scale: number;
   hover?: boolean;
+  colorsTrails?: Color;
 };
 
 const Controls = () => {
@@ -61,6 +63,7 @@ const App = () => {
       image: "/React-icon.png",
       width: 80,
       scale: 1,
+      colorsTrails: [1, 5, 9],
     },
     {
       position: [0.5, -3, 5],
@@ -70,6 +73,7 @@ const App = () => {
       image: "/angular-logo.png",
       width: 80,
       scale: 1.1,
+      colorsTrails: [9, 1, 1],
     },
     {
       position: [-0.5, 1.7, -2.9],
@@ -79,6 +83,7 @@ const App = () => {
       image: "/java.png",
       width: 120,
       scale: 0.7,
+      colorsTrails: [1, 9, 1],
     },
     {
       position: [-0.5, -0.3, -3.2],
@@ -88,6 +93,7 @@ const App = () => {
       image: "/php.png",
       width: 100,
       scale: 0.8,
+      colorsTrails: [1, 9, 9],
     },
   ];
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -103,7 +109,7 @@ const App = () => {
         fade
         speed={1}
       />
-      <NuageGalactique />
+
       {/*       <group position={[0, 0, -6]} scale={0.2}>
           <Galaxy />
         </group>
@@ -127,14 +133,17 @@ const App = () => {
       <EffectComposer>
         <Bloom mipmapBlur luminanceThreshold={2} />
       </EffectComposer>
-      <FloatingCamera amplitude={0.7} speed={0.5} />
-      <Controls />
+      {/* <FloatingCamera amplitude={0.7} speed={0.5} /> */}
+
+      {/* <Controls /> */}
       <BackgroundMusic
         musicUrl="son.mp3"
         volume={0.5}
         loop={true}
         playOnMount={false}
       />
+
+      <OrbitControls />
     </Canvas>
   );
 };
